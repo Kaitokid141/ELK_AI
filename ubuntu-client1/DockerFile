@@ -1,0 +1,32 @@
+# Sử dụng image Ubuntu làm base image
+FROM ubuntu:20.04
+
+# Thiết lập thông tin môi trường
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Cài đặt các gói cần thiết
+RUN apt-get update && apt-get install -y \
+    openssh-server \
+    sudo \
+    rsyslog \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Tạo thư mục cho SSH
+RUN mkdir /var/run/sshd
+
+# Thiết lập mật khẩu cho người dùng root (đổi 'your_password' thành mật khẩu bạn muốn)
+RUN echo 'root:123' | chpasswd
+
+# Cho phép người dùng root đăng nhập qua SSH
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+# Cấu hình rsyslog
+RUN sed -i 's/#daemon.*$//g' /etc/rsyslog.conf
+
+# Mở cổng SSH và cổng rsyslog
+EXPOSE 22
+EXPOSE 514/udp
+
+# Khởi động dịch vụ SSH và rsyslog
+CMD service rsyslog start && /usr/sbin/sshd -D

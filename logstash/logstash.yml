@@ -1,0 +1,5 @@
+node.name: ${NODE_NAME}
+path.queue: /usr/share/logstash/data/queue
+queue.max_bytes: 1024mb
+queue.type: persisted
+xpack.monitoring.enabled: ${xpack.monitoring.enabled}
